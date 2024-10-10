@@ -1,91 +1,67 @@
 // app/auth/signup/page.js
 
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState } from 'react';
+import api from '../../../utils/api';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [userInfo, setUserInfo] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password1, setPassword1] = useState('');
+  const [password2, setPassword2] = useState('');
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      body: JSON.stringify(userInfo),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      // Redirect to sign-in page
-      router.push("/auth/signin");
-    } else {
-      // Display error message
-      setError(data.error || "An error occurred");
+    if (password1 !== password2) {
+      alert('Passwords do not match.');
+      return;
+    }
+    try {
+      await api.post('/dj-rest-auth/registration/', {
+        email,
+        password1,
+        password2,
+      });
+      alert('Registration successful. Please check your email to verify your account.');
+      router.push('/auth/signin');
+    } catch (error) {
+      console.error(error);
+      alert('Error registering.');
     }
   };
 
   return (
     <div>
       <h1>Sign Up</h1>
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
       <form onSubmit={handleSignUp}>
-        <div>
-          <label>
-            Name:
-            <input
-              type="text"
-              value={userInfo.name}
-              onChange={(e) =>
-                setUserInfo({ ...userInfo, name: e.target.value })
-              }
-              required
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            Email:
-            <input
-              type="email"
-              value={userInfo.email}
-              onChange={(e) =>
-                setUserInfo({ ...userInfo, email: e.target.value })
-              }
-              required
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            Password:
-            <input
-              type="password"
-              value={userInfo.password}
-              onChange={(e) =>
-                setUserInfo({ ...userInfo, password: e.target.value })
-              }
-              required
-              minLength={6}
-            />
-          </label>
-        </div>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password1}
+          onChange={(e) => setPassword1(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          value={password2}
+          onChange={(e) => setPassword2(e.target.value)}
+          required
+        />
         <button type="submit">Sign Up</button>
       </form>
-
       <p>
-        Already have an account? <a href="/auth/signin">Sign In</a>
+        Already have an account? <Link href="/auth/signin">Sign In</Link>
       </p>
     </div>
   );

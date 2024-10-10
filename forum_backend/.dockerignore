@@ -1,0 +1,12 @@
+# forum_backend/.dockerignore
+
+venv
+*.pyc
+__pycache__
+.env
+.env.local
+.git
+.gitignore
+media
+staticfiles
+node_modules

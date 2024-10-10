@@ -1,19 +1,44 @@
 // app/posts/[postId]/page.js
 
-import axios from "axios";
+'use client';
 
-export default async function PostPage({ params }) {
-  const { postId } = params;
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useParams } from 'next/navigation';
+import DOMPurify from 'dompurify';
+import CommentSection from '../../components/CommentSection';
 
-  // Fetch the individual post from your backend API
-  const res = await axios.get(`http://localhost:8000/api/posts/${postId}/`);
-  const post = res.data;
+export default function PostDetailPage() {
+  const { postId } = useParams();
+  const [post, setPost] = useState(null);
+
+  const fetchPost = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/api/posts/${postId}/`
+      );
+      setPost(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPost();
+  }, [postId]);
+
+  if (!post) return <p>Loading...</p>;
 
   return (
     <div>
       <h1>{post.title}</h1>
-      <p>{post.content}</p>
-      {/* Add any other post details you need */}
+      <p>Issue Solved: {post.is_solved ? 'Yes' : 'No'}</p>
+      <div
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(post.description),
+        }}
+      />
+      <CommentSection postId={postId} />
     </div>
   );
 }

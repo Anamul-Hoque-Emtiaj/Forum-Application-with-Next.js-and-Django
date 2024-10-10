@@ -1,34 +1,35 @@
 // app/user/page.js
 
-"use client";
+'use client';
 
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from 'react';
+import api from '../../utils/api';
 
-export default function UserProfile() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+export default function UserProfilePage() {
+  const [user, setUser] = useState(null);
 
-  if (status === "loading") {
-    return <p>Loading...</p>;
-  }
+  const fetchUser = async () => {
+    try {
+      const res = await api.get('/dj-rest-auth/user/');
+      setUser(res.data);
+    } catch (error) {
+      console.error(error);
+      alert('Please log in.');
+      window.location.href = '/auth/signin';
+    }
+  };
 
-  if (!session) {
-    // If not authenticated, redirect to sign-in page
-    router.push("/auth/signin");
-    return null;
-  }
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  if (!user) return <p>Loading...</p>;
 
   return (
     <div>
       <h1>User Profile</h1>
-      <p>
-        <strong>Name:</strong> {session.user.name}
-      </p>
-      <p>
-        <strong>Email:</strong> {session.user.email}
-      </p>
-      <button onClick={() => signOut({ callbackUrl: "/" })}>Sign Out</button>
+      <p>Email: {user.email}</p>
+      {/* Add more user info as needed */}
     </div>
   );
 }

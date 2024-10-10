@@ -1,93 +1,63 @@
 // app/auth/signin/page.js
 
-"use client";
+'use client';
 
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import React, { useState } from 'react';
+import api from '../../../utils/api';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function SignInPage() {
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
-  const [userInfo, setUserInfo] = useState({ email: "", password: "" });
-  const [providers, setProviders] = useState(null);
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  useEffect(() => {
-    (async () => {
-      const res = await fetch("/api/auth/providers");
-      const data = await res.json();
-      setProviders(data);
-    })();
-  }, []);
-
-  const handleSubmit = async (e) => {
+  const handleManualSignIn = async (e) => {
     e.preventDefault();
+    try {
+      const res = await api.post('/dj-rest-auth/login/', {
+        email,
+        password,
+      });
+      localStorage.setItem('authToken', res.data.access_token);
+      router.push('/');
+    } catch (error) {
+      console.error(error);
+      alert('Invalid credentials.');
+    }
+  };
 
-    const res = await signIn("credentials", {
-      email: userInfo.email,
-      password: userInfo.password,
-      redirect: true,
-      callbackUrl,
-    });
-
-    // Handle errors or success as needed
+  const handleGoogleSignIn = async () => {
+    // Redirect to the backend endpoint for Google OAuth
+    window.location.href = 'http://localhost:8000/api/dj-rest-auth/google/?redirect_uri=http://localhost:3000/auth/google/callback';
   };
 
   return (
     <div>
       <h1>Sign In</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>
-            Email:
-            <input
-              type="email"
-              value={userInfo.email}
-              onChange={(e) =>
-                setUserInfo({ ...userInfo, email: e.target.value })
-              }
-              required
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            Password:
-            <input
-              type="password"
-              value={userInfo.password}
-              onChange={(e) =>
-                setUserInfo({ ...userInfo, password: e.target.value })
-              }
-              required
-            />
-          </label>
-        </div>
+      <form onSubmit={handleManualSignIn}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
         <button type="submit">Sign In</button>
       </form>
-
-      <hr />
-
-      {providers &&
-        Object.values(providers).map((provider) => {
-          if (provider.id === "credentials") {
-            return null;
-          }
-          return (
-            <div key={provider.name}>
-              <button
-                onClick={() =>
-                  signIn(provider.id, { callbackUrl })
-                }
-              >
-                Sign in with {provider.name}
-              </button>
-            </div>
-          );
-        })}
-
+      <button onClick={handleGoogleSignIn}>Sign In with Google</button>
       <p>
-        Don't have an account? <a href="/auth/signup">Sign Up</a>
+        Don't have an account? <Link href="/auth/signup">Sign Up</Link>
+      </p>
+      <p>
+        Forgot your password? <Link href="/auth/forgot-password">Reset Password</Link>
       </p>
     </div>
   );
