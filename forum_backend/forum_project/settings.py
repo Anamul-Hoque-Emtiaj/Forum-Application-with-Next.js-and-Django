@@ -45,8 +45,9 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',  # Uncomment if using session authentication
+    'django.middleware.csrf.CsrfViewMiddleware', 
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # Added middleware
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -118,15 +119,31 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',  # Uncomment if using session authentication
     ),
+    # Optionally, you can add other settings like pagination, permissions, etc.
 }
 
 # Simple JWT settings
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=config('ACCESS_TOKEN_LIFETIME', default=60, cast=int)),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=config('REFRESH_TOKEN_LIFETIME', default=1, cast=int)),
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': config('SECRET_KEY', default='your-secret-key'),  # Use your SECRET_KEY
+    'VERIFYING_KEY': None,
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'TOKEN_TYPE_CLAIM': 'token_type',
 }
+
+# Tell dj-rest-auth to use JWT authentication
+REST_USE_JWT = True
+
+# Prevent dj-rest-auth from using the default Token model
+TOKEN_MODEL = None
 
 # CORS configuration
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000', cast=Csv())
@@ -176,12 +193,9 @@ ACCOUNT_UNIQUE_EMAIL = True
 LOGIN_URL = 'http://localhost:3000/auth/signin/'  # Frontend login URL
 LOGIN_REDIRECT_URL = 'http://localhost:3000/'      # Frontend home URL
 
-
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:3000')
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = f'{FRONTEND_URL}/auth/email-verified/'
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = f'{FRONTEND_URL}/auth/email-verified/'
-
-
 
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'forum_app.serializers.UserSerializer',

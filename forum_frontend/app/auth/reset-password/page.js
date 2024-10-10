@@ -3,56 +3,49 @@
 'use client';
 
 import React, { useState } from 'react';
-import api from '../../../utils/api';
 import { useSearchParams } from 'next/navigation';
+import api from '../../../utils/api';
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
-  const [password1, setPassword1] = useState('');
-  const [password2, setPassword2] = useState('');
-  const [message, setMessage] = useState('');
-
   const uid = searchParams.get('uid');
   const token = searchParams.get('token');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleResetPassword = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password1 !== password2) {
-      alert('Passwords do not match.');
-      return;
-    }
     try {
       await api.post('/dj-rest-auth/password/reset/confirm/', {
         uid,
         token,
-        new_password1: password1,
-        new_password2: password2,
+        new_password1: password,
+        new_password2: confirmPassword,
       });
-      setMessage('Password reset successful.');
+      alert('Password reset successful. You can now log in.');
+      window.location.href = '/auth/signin';
     } catch (error) {
-      console.error(error);
-      setMessage('Error resetting password.');
+      console.error('Error resetting password:', error);
+      alert('Failed to reset password. Please try again.');
     }
   };
 
   return (
     <div>
       <h1>Reset Password</h1>
-      {message && <p>{message}</p>}
-      <form onSubmit={handleResetPassword}>
+      {/* Form for resetting password */}
+      <form onSubmit={handleSubmit}>
         <input
           type="password"
           placeholder="New Password"
-          value={password1}
-          onChange={(e) => setPassword1(e.target.value)}
-          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <input
           type="password"
-          placeholder="Confirm Password"
-          value={password2}
-          onChange={(e) => setPassword2(e.target.value)}
-          required
+          placeholder="Confirm New Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
         />
         <button type="submit">Reset Password</button>
       </form>

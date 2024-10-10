@@ -38,11 +38,11 @@ export default function Notification() {
   if (notifications.length === 0) return null;
 
   return (
-    <div className="notifications">
-      <h4>Notifications</h4>
+    <div className="fixed top-16 right-4 w-80 bg-white shadow-lg rounded-lg p-4 z-50">
+      <h4 className="text-lg font-semibold mb-2">Notifications</h4>
       {notifications.map((notif, index) => (
-        <div key={index}>
-          <p>{notif.message}</p>
+        <div key={index} className="bg-gray-100 p-2 rounded mb-2">
+          <p className="text-gray-800">{notif.message}</p>
         </div>
       ))}
     </div>

@@ -45,14 +45,22 @@ export default function CommentSection({ postId }) {
   }, [postId]);
 
   return (
-    <div>
-      <h3>Comments</h3>
-      <textarea
-        placeholder="Add a comment"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      ></textarea>
-      <button onClick={handleCommentSubmit}>Submit</button>
+    <div className="mt-4 p-4 border rounded-lg shadow-lg bg-white dark:bg-gray-800">
+      <h3 className="text-xl font-semibold mb-4">Comments</h3>
+      <div className="mb-4">
+        <textarea
+          className="w-full h-24 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          placeholder="Add a comment"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        ></textarea>
+        <button
+          onClick={handleCommentSubmit}
+          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
+        >
+          Submit
+        </button>
+      </div>
       <CommentList comments={comments} />
     </div>
   );
@@ -60,12 +68,9 @@ export default function CommentSection({ postId }) {
 
 function CommentList({ comments }) {
   return (
-    <ul>
+    <ul className="divide-y divide-gray-200">
       {comments.map((comment) => (
-        <CommentItem
-          key={comment.id}
-          comment={comment}
-        />
+        <CommentItem key={comment.id} comment={comment} />
       ))}
     </ul>
   );
@@ -93,7 +98,7 @@ function CommentItem({ comment }) {
       );
       setReplyContent('');
       setShowReplyBox(false);
-      // You may need to refresh comments here
+      // Refresh comments if necessary
     } catch (error) {
       console.error(error);
       alert('Error submitting reply.');
@@ -101,30 +106,34 @@ function CommentItem({ comment }) {
   };
 
   return (
-    <li>
-      <p>{comment.content}</p>
-      <button onClick={() => setShowReplyBox(!showReplyBox)}>
+    <li className="py-2">
+      <p className="text-gray-800 dark:text-gray-200">{comment.content}</p>
+      <button
+        onClick={() => setShowReplyBox(!showReplyBox)}
+        className="mt-2 text-blue-500 hover:underline"
+      >
         Reply
       </button>
       {showReplyBox && (
-        <div>
+        <div className="mt-2">
           <textarea
+            className="w-full h-20 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             placeholder="Add a reply"
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
           ></textarea>
-          <button onClick={handleReplySubmit}>
+          <button
+            onClick={handleReplySubmit}
+            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
+          >
             Submit Reply
           </button>
         </div>
       )}
       {comment.replies && comment.replies.length > 0 && (
-        <ul>
+        <ul className="mt-4 ml-4">
           {comment.replies.map((reply) => (
-            <CommentItem
-              key={reply.id}
-              comment={reply}
-            />
+            <CommentItem key={reply.id} comment={reply} />
           ))}
         </ul>
       )}

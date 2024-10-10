@@ -1,23 +1,21 @@
-# forum_backend/Dockerfile
-
-# Base image
-FROM python:3.9-slim
+# Use the official Python image
+FROM python:3.10-slim
 
 # Set environment variables
-ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
 # Set work directory
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    libpq-dev \
-    netcat \
+    libffi-dev \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
@@ -25,12 +23,10 @@ RUN pip install -r requirements.txt
 # Copy project
 COPY . .
 
-# Create a user to run the application
-RUN adduser --disabled-password --no-create-home appuser
-USER appuser
+RUN python manage.py makemigrations 
 
-# Expose port 8000
-EXPOSE 8000
+# Apply database migrations
+RUN python manage.py migrate
 
-# Command to run when starting the container
-CMD ["sh", "-c", "python manage.py makemigrations && python manage.py migrate --noinput && gunicorn forum_project.wsgi:application --bind 0.0.0.0:8000"]
+# Command to run the application
+CMD ["gunicorn", "forum_project.wsgi:application", "--bind", "0.0.0.0:8000"]

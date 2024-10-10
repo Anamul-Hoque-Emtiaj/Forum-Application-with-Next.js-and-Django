@@ -10,8 +10,8 @@ services:
     image: forum_backend_image
     container_name: forum_backend
     command: >
-      sh -c "python manage.py migrate &&
-             python manage.py collectstatic --noinput &&
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
              gunicorn forum_project.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000"
     volumes:
       - ./forum_backend:/app
@@ -42,25 +42,6 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    image: frontend_image
-    container_name: frontend
-    volumes:
-      - ./frontend:/app
-    ports:
-      - "3000:3000"
-    env_file:
-      - ./frontend/.env
-
-  redis:
-    image: redis:6-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-
   celery-beat:
     build:
       context: ./forum_backend
@@ -77,3 +58,27 @@ services:
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+  frontend:
+    build:
+      context: ./forum_frontend
+      dockerfile: Dockerfile
+    image: frontend_image
+    container_name: forum_frontend
+    volumes:
+      - ./forum_frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./forum_frontend/.env
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=http://backend:8000
+
+  redis:
+    image: redis:6-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"

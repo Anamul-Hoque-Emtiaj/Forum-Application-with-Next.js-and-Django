@@ -29,14 +29,19 @@ export default function PostsPage() {
   }, []);
 
   return (
-    <div>
-      <h1>Forum Posts</h1>
-      <button onClick={() => setIsModalOpen(true)}>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-4">Forum Posts</h1>
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="bg-blue-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-blue-700 transition mb-4"
+      >
         Add New Post
       </button>
-      {posts.map((post) => (
-        <PostListItem key={post.id} post={post} />
-      ))}
+      <div className="space-y-4">
+        {posts.map((post) => (
+          <PostListItem key={post.id} post={post} />
+        ))}
+      </div>
       {isModalOpen && (
         <PostModal
           onClose={() => setIsModalOpen(false)}

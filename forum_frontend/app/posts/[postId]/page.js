@@ -27,13 +27,16 @@ export default function PostDetailPage() {
     fetchPost();
   }, [postId]);
 
-  if (!post) return <p>Loading...</p>;
+  if (!post) return <p className="text-center">Loading...</p>;
 
   return (
-    <div>
-      <h1>{post.title}</h1>
-      <p>Issue Solved: {post.is_solved ? 'Yes' : 'No'}</p>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
+      <p className="text-gray-600 mb-4">
+        <strong>Issue Solved:</strong> {post.is_solved ? 'Yes' : 'No'}
+      </p>
       <div
+        className="prose lg:prose-xl mb-4"
         dangerouslySetInnerHTML={{
           __html: DOMPurify.sanitize(post.description),
         }}

@@ -1,18 +1,18 @@
 // app/auth/error/page.js
 
-"use client";
+'use client';
 
-import { useSearchParams } from "next/navigation";
+import React from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export default function ErrorPage() {
   const searchParams = useSearchParams();
-  const error = searchParams.get("error");
+  const error = searchParams.get('error');
 
   return (
     <div>
-      <h1>Authentication Error</h1>
+      <h1>Error</h1>
       <p>{error}</p>
-      <a href="/auth/signin">Go back to Sign In</a>
     </div>
   );
 }

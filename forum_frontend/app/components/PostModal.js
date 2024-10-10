@@ -31,21 +31,34 @@ export default function PostModal({ onClose, onPostCreated }) {
   };
 
   return (
-    <div className="modal">
-      <div className="modal-content">
-        <h2>Create New Post</h2>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+        <h2 className="text-2xl font-bold mb-4">Create New Post</h2>
         <input
           type="text"
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          className="border border-gray-300 rounded-md p-2 mb-4 w-full"
         />
         <PostEditor
           value={description}
           onChange={setDescription}
         />
-        <button onClick={handleSubmit}>Submit</button>
-        <button onClick={onClose}>Cancel</button>
+        <div className="flex justify-end space-x-2 mt-4">
+          <button
+            onClick={handleSubmit}
+            className="bg-blue-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-blue-700 transition"
+          >
+            Submit
+          </button>
+          <button
+            onClick={onClose}
+            className="bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded-md hover:bg-gray-400 transition"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );

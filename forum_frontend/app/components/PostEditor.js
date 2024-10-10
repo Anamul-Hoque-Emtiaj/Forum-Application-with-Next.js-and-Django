@@ -22,19 +22,16 @@ export default function PostEditor({ value, onChange }) {
     input.onchange = async () => {
       const file = input.files[0];
       if (file) {
-        // Prepare form data
         const formData = new FormData();
         formData.append('image', file);
 
         try {
-          // Upload image to the backend
           const res = await api.post('/upload/', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
           });
 
-          // Insert the image into the editor
           const quill = quillRef.current.getEditor();
           const range = quill.getSelection();
           quill.insertEmbed(range.index, 'image', res.data.url);
@@ -72,17 +69,18 @@ export default function PostEditor({ value, onChange }) {
     'image',
   ];
 
-  // Create a ref to access the Quill editor instance
   const quillRef = React.useRef(null);
 
   return (
-    <ReactQuill
-      ref={quillRef}
-      value={value}
-      onChange={onChange}
-      modules={modules}
-      formats={formats}
-      theme="snow"
-    />
+    <div className="bg-white p-4 rounded-lg shadow-md">
+      <ReactQuill
+        ref={quillRef}
+        value={value}
+        onChange={onChange}
+        modules={modules}
+        formats={formats}
+        theme="snow"
+      />
+    </div>
   );
 }

@@ -23,19 +23,27 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div>
-      <h1>Forgot Password</h1>
-      {message && <p>{message}</p>}
-      <form onSubmit={handleForgotPassword}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <button type="submit">Send Reset Link</button>
-      </form>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white shadow-md rounded-lg p-8 w-96">
+        <h1 className="text-2xl font-bold mb-6 text-center">Forgot Password</h1>
+        {message && <p className="text-center text-red-500 mb-4">{message}</p>}
+        <form onSubmit={handleForgotPassword}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full p-2 border border-gray-300 rounded mb-4"
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
+          >
+            Send Reset Link
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
