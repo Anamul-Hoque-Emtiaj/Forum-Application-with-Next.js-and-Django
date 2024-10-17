@@ -1,98 +1,58 @@
 // app/auth/signup/page.js
-
-'use client';
-
-import React, { useState } from 'react';
-import api from '../../../utils/api';
-import { useRouter } from 'next/navigation';
+"use client";
+import React from 'react';
+import axios from 'axios';
 import Link from 'next/link';
+import OAuthButton from '../../components/Auth/OAuthButton';
+import SignupForm from '../../components/Auth/SignupForm';
+import { signIn } from 'next-auth/react'; 
+import { getDeviceId } from '../../../utils/device';
 
-export default function SignUpPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password1, setPassword1] = useState('');
-  const [password2, setPassword2] = useState('');
-  const [error, setError] = useState('');
-
-  const handleSignUp = async (e) => {
+const Signup = () => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    setError('');
-
-    if (password1 !== password2) {
-      setError('Passwords do not match.');
-      return;
-    }
+    const username = e.target.username.value;
+    const email = e.target.email.value;
+    const password1 = e.target.password1.value;
+    const password2 = e.target.password2.value;
+    const first_name = e.target.first_name.value;
+    const last_name = e.target.last_name.value;
 
     try {
-      await api.post('/dj-rest-auth/registration/', {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/registration/`, {
+        username,
         email,
         password1,
         password2,
+        first_name,
+        last_name,
       });
-      alert('Registration successful. Please check your email to verify your account.');
-      router.push('/auth/signin');
+      alert('Signup successful! Please verify your email before logging in.');
+      window.location.href = '/auth/login';
     } catch (error) {
-      console.error(error);
-      // Extract and display error messages from the response if available
-      if (error.response && error.response.data) {
-        const messages = Object.values(error.response.data).flat();
-        setError(messages.join(' '));
-      } else {
-        setError('Error registering. Please try again.');
-      }
+      console.error('Signup error:', error);
+      alert('Signup failed. Please try again.');
     }
   };
 
+  const handleGoogleLogin = () => {
+    signIn('google', { callbackUrl: '/auth/device-add' });
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-100 to-blue-50 p-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-2xl font-semibold text-center text-gray-800 mb-6">Sign Up</h1>
-        {error && <div className="text-red-500 text-sm mb-4 text-center">{error}</div>}
-        <form onSubmit={handleSignUp}>
-          <div className="mb-4">
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="mb-4">
-            <input
-              type="password"
-              placeholder="Password"
-              value={password1}
-              onChange={(e) => setPassword1(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="mb-6">
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={password2}
-              onChange={(e) => setPassword2(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
-          >
-            Sign Up
-          </button>
-        </form>
-        <p className="mt-4 text-center text-gray-600">
-          Already have an account?{' '}
-          <Link href="/auth/signin" className="text-blue-600 hover:underline">
-            Sign In
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="w-full max-w-md p-8 space-y-4 bg-white rounded shadow">
+        <h2 className="text-2xl font-bold text-center">Signup</h2>
+        <SignupForm onSubmit={handleSignup} />
+        <OAuthButton onClick={handleGoogleLogin} provider="Google" />
+        <div className="text-center">
+          <Link href="/auth/login" className="text-sm text-blue-600 hover:underline">
+            Already have an account? Login
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default Signup;

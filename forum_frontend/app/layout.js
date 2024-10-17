@@ -1,20 +1,17 @@
-// app/layout.js
+"use client";
 
-import React from 'react';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+import { SessionProvider } from "next-auth/react";
 import './globals.css';
+import Header from './components/Layout/Header'; // Correct import path
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <head>
-        <title>Forum Application</title>
-      </head>
       <body>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <SessionProvider>
+          <Header /> {/* Header now wrapped by SessionProvider */}
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );

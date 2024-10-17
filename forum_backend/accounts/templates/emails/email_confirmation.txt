@@ -1,0 +1,10 @@
+Hi,
+
+Please confirm your email by clicking the link below:
+
+<a href="{{ confirmation_url }}">Confirm Email</a>
+
+If you did not sign up for this account, please ignore this email.
+
+Thanks,
+Med-Sparkle Team

@@ -1,12 +1,37 @@
-# forum_backend/.dockerignore
+# .dockerignore
 
-venv
+# Python
 *.pyc
-__pycache__
-.env
-.env.local
+*.pyo
+*.pyd
+__pycache__/
+*.sqlite3
+*.log
+
+# Django
+staticfiles/
+media/
+
+# Virtual environment
+venv/
+ENV/
+env/
+.venv/
+
+# Docker
+docker-compose.yml
+Dockerfile
+
+# Git
 .git
 .gitignore
-media
-staticfiles
-node_modules
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
