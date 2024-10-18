@@ -19,7 +19,7 @@ const Signup = () => {
     const last_name = e.target.last_name.value;
 
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/registration/`, {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL_CLIENT}/registration/`, {
         username,
         email,
         password1,

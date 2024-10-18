@@ -32,7 +32,7 @@ const PasswordResetPage = () => {
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/password/reset/confirm/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL_CLIENT}/password/reset/confirm/`,
         {
           uid,
           token,

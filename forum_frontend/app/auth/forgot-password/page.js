@@ -10,7 +10,7 @@ const ForgotPassword = () => {
     const email = e.target.email.value;
 
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/password/reset/`, {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL_CLIENT}/password/reset/`, {
         email,
       });
       // Inform the user to check their email

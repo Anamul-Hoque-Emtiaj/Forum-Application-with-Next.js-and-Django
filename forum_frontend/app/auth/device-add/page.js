@@ -24,7 +24,7 @@ const DeviceAdd = () => {
 
         try {
           const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/add-device/`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL_CLIENT}/add-device/`,
             { device_id: deviceId },
             {
               headers: {

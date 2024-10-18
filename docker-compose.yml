@@ -1,84 +1,90 @@
-# docker-compose.yml
-
-version: '3.8'
+version: '3.9'
 
 services:
   backend:
     build:
       context: ./forum_backend
       dockerfile: Dockerfile
-    image: forum_backend_image
-    container_name: forum_backend
-    command: >
-      sh -c "python manage.py makemigrations &&
-             python manage.py migrate &&
-             gunicorn forum_project.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000"
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./forum_backend:/app
+      - backend_data:/app/data
+      - media:/app/media
     ports:
       - "8000:8000"
     env_file:
       - ./forum_backend/.env
+    environment:
+      - ALLOWED_HOSTS=*
     depends_on:
       - redis
+    networks:
+      - forum_network
+
+  daphne:
+    build:
+      context: ./forum_backend
+      dockerfile: Dockerfile
+    command: daphne -b 0.0.0.0 -p 8001 config.asgi:application
+    volumes:
+      - ./forum_backend:/app
+      - backend_data:/app/data
+      - media:/app/media
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./forum_backend/.env
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - ALLOWED_HOSTS=*
+    depends_on:
+      - backend
+      - redis
+    networks:
+      - forum_network
 
   celery:
     build:
       context: ./forum_backend
       dockerfile: Dockerfile
-    image: celery_worker_image
-    container_name: celery_worker
-    command: celery -A forum_project worker --loglevel=info
+    command: celery -A config worker --loglevel=info --pool=solo
     volumes:
       - ./forum_backend:/app
+      - backend_data:/app/data
+      - media:/app/media
     env_file:
       - ./forum_backend/.env
     depends_on:
+      - backend
       - redis
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-
-  celery-beat:
-    build:
-      context: ./forum_backend
-      dockerfile: Dockerfile
-    image: celery_beat_image
-    container_name: celery_beat
-    command: celery -A forum_project beat --loglevel=info
-    volumes:
-      - ./forum_backend:/app
-    env_file:
-      - ./forum_backend/.env
-    depends_on:
-      - redis
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - forum_network
 
   frontend:
     build:
       context: ./forum_frontend
       dockerfile: Dockerfile
-    image: frontend_image
-    container_name: forum_frontend
     volumes:
       - ./forum_frontend:/app
-      - /app/node_modules
     ports:
       - "3000:3000"
     env_file:
-      - ./forum_frontend/.env
+      - ./forum_frontend/.env.local
     depends_on:
       - backend
-    environment:
-      - NEXT_PUBLIC_BACKEND_URL=http://backend:8000
+    networks:
+      - forum_network
 
   redis:
-    image: redis:6-alpine
-    container_name: redis
+    image: redis:7-alpine
     ports:
       - "6379:6379"
+    networks:
+      - forum_network
+
+volumes:
+  backend_data:
+  media:
+
+networks:
+  forum_network:
+    driver: bridge

@@ -17,7 +17,7 @@ const Profile = () => {
       if (session && session.accessToken) {
         const fetchProfile = async () => {
           try {
-            const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user-details/`, {
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL_CLIENT}/user-details/`, {
               headers: {
                 Authorization: `Token ${session.accessToken}`,
               },
@@ -38,7 +38,7 @@ const Profile = () => {
 
   const handleUpdate = async (updatedData) => {
     try {
-      const res = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/profile/`, updatedData, {
+      const res = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL_CLIENT}/profile/`, updatedData, {
         headers: {
           Authorization: `Token ${session.accessToken}`,
         },

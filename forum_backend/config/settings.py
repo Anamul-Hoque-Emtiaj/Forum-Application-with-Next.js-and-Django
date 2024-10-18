@@ -1,5 +1,3 @@
-# settings.py
-
 from pathlib import Path
 from decouple import config, Csv
 from datetime import timedelta
@@ -34,8 +32,9 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'corsheaders',
-    'channels',
     'django.contrib.sites',
+    'django_celery_beat',
+    'channels',
 
     # Allauth apps
     'allauth',
@@ -69,7 +68,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Ensure you have a templates directory
+        'DIRS': os.path.join(BASE_DIR, 'templates'),  # Ensure you have a templates directory
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -108,7 +107,7 @@ ASGI_APPLICATION = 'config.asgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'data', 'db.sqlite3'),
     }
 }
 
@@ -168,19 +167,23 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
+# Redis Configuration
+REDIS_HOST = config('REDIS_HOST', default='redis')
+REDIS_PORT = config('REDIS_PORT', default=6379, cast=int)
+
 # Channels Configuration
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [(config('REDIS_HOST'), config('REDIS_PORT', cast=int))],
+            'hosts': [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }
 
 # Celery Configuration
-CELERY_BROKER_URL = config('CELERY_BROKER_URL')
-CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND')
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=f'redis://{REDIS_HOST}:{REDIS_PORT}/0')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default=f'redis://{REDIS_HOST}:{REDIS_PORT}/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -292,4 +295,3 @@ REST_AUTH_REGISTER_SERIALIZER = 'accounts.serializers.CustomRegisterSerializer'
 #     ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 # else:
 #     ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
-

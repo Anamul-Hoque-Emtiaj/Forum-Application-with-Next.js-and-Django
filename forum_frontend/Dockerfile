@@ -1,22 +1,20 @@
-# frontend/Dockerfile
-
-# Base image
+# Use the official Node.js image.
 FROM node:18-alpine
 
-# Set working directory
+# Set work directory
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY package.json package-lock.json* ./
+COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Copy project files
 COPY . .
 
-# Expose port 3000
+# Expose port
 EXPOSE 3000
 
-# Command to run when starting the container
+# Run the application
 CMD ["npm", "run", "dev"]

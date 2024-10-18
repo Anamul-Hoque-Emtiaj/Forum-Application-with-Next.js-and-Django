@@ -6,8 +6,7 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=True)
+    is_resolved = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-created_at']
@@ -23,10 +22,6 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        indexes = [
-            models.Index(fields=['post']),
-            models.Index(fields=['parent']),
-        ]
         ordering = ['created_at']
 
     def __str__(self):

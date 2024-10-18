@@ -15,13 +15,13 @@ const Devices = () => {
     if (session) {
       const fetchDevices = async () => {
         try {
-          const res1 = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/my-userid/`, {
+          const res1 = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL_CLIENT}/my-userid/`, {
             headers: {
               Authorization: `Token ${session.accessToken}`,
             },
           });
           const uid = res1.data.uid;
-          const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user-device/${uid}/`, {
+          const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL_CLIENT}/user-device/${uid}/`, {
             headers: {
               Authorization: `Token ${session.accessToken}`,
             },
@@ -40,7 +40,7 @@ const Devices = () => {
     <ProtectedRoute>
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="w-full max-w-2xl p-8 space-y-4 bg-white rounded shadow">
-          <h1 className="text-2xl font-bold text-center">Devices</h1>
+          <h1 className="text-2xl font-bold text-black text-center">Devices</h1>
           <DeviceList devices={devices} />
         </div>
       </div>

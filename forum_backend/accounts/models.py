@@ -21,10 +21,8 @@ class Device(models.Model):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        # unique_together = ('user', 'device_id')
         indexes = [
             models.Index(fields=['user', 'is_active']),
-            models.Index(fields=['device_id']),
         ]
 
     def __str__(self):

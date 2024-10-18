@@ -11,12 +11,11 @@ class CommentInline(admin.TabularInline):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'is_active', 'created_at', 'updated_at')
+    list_display = ('title', 'author', 'is_resolved', 'created_at')
     search_fields = ('title', 'description', 'author__username')
-    list_filter = ('is_active', 'created_at', 'author')
+    list_filter = ('is_resolved', 'created_at', 'author')
     ordering = ('-created_at',)
     inlines = [CommentInline]
-    readonly_fields = ('created_at', 'updated_at')
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):

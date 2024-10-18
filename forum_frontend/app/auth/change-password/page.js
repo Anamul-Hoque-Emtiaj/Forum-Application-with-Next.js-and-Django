@@ -26,7 +26,7 @@ const ChangePassword = () => {
     }
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/password/change/`, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL_CLIENT}/password/change/`, {
         old_password: currentPassword,
         new_password1: newPassword,
         new_password2: confirmNewPassword,

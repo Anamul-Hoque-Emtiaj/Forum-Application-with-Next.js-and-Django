@@ -17,9 +17,9 @@ const ConfirmEmail = () => {
     setKey(keyFromUrl);
 
     if (keyFromUrl) {
-      const confirmEmail = async () => {
+      const confirmEmailNow = async () => {
         try {
-          const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/registration/verify-email/`, {
+          const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL_CLIENT}/registration/verify-email/`, {
             key: keyFromUrl,
           });
           setStatusMessage(response.data.message); // Show success message
@@ -29,7 +29,7 @@ const ConfirmEmail = () => {
           setIsLoading(false);
         }
       };
-      confirmEmail();
+      confirmEmailNow();
     }
   }, [router]);
 
