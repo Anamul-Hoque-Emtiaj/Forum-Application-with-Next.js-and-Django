@@ -4,7 +4,6 @@ from celery import shared_task
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
-from django.contrib.sites.models import Site
 
 @shared_task
 def send_email_confirmation(user_email, confirmation_url):

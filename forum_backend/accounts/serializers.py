@@ -4,6 +4,31 @@ from dj_rest_auth.serializers import LoginSerializer,UserDetailsSerializer
 from rest_framework import serializers
 from .models import Device,CustomUser
 from django.utils.timezone import now
+from allauth.account.forms import default_token_generator
+from allauth.account.utils import user_pk_to_url_str
+from django.conf import settings
+from .tasks import send_password_reset_email
+
+
+class CustomPasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        try:
+            user = CustomUser.objects.get(email=value)
+        except CustomUser.DoesNotExist:
+            raise serializers.ValidationError("User with this email does not exist.")
+        return value
+
+    def save(self):
+        request = self.context.get('request')
+        email = self.validated_data['email']
+        user = CustomUser.objects.get(email=email)
+        token = default_token_generator.make_token(user)
+        uid = user_pk_to_url_str(user)
+        reset_url = f"{settings.FRONTEND_URL}/auth/password-reset/{uid}/{token}"
+        # Trigger the Celery task to send the password reset email
+        send_password_reset_email.delay(email, reset_url)
 
 class CustomLoginSerializer(LoginSerializer):
     username = None  # Remove the username field

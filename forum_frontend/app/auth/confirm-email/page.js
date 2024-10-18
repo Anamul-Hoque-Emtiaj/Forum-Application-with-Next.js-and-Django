@@ -1,40 +1,49 @@
-"use client"; // Ensure this is a client component
+"use client";
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // Correct hook for App Router
+import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 
 const ConfirmEmail = () => {
-  const router = useRouter(); // Correct hook for App Router
-  const [key, setKey] = useState(null); // State to store the confirmation key
+  const searchParams = useSearchParams();
+  const key = searchParams.get('key');
   const [statusMessage, setStatusMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Ensure the code runs on the client side
-    const searchParams = new URL(window.location.href).searchParams;
-    const keyFromUrl = searchParams.get('key');
-    setKey(keyFromUrl);
+    const confirmEmail = async () => {
+      if (!key) {
+        setStatusMessage('Invalid confirmation link.');
+        setIsLoading(false);
+        return;
+      }
 
-    if (keyFromUrl) {
-      const confirmEmailNow = async () => {
-        try {
-          const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL_CLIENT}/registration/verify-email/`, {
-            key: keyFromUrl,
-          });
-          setStatusMessage(response.data.message); // Show success message
-        } catch (error) {
-          setStatusMessage('Invalid or expired confirmation link.');
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      confirmEmailNow();
-    }
-  }, [router]);
+      try {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL_CLIENT}/auth/registration/verify-email/`, {
+          key: key,
+        });
+
+        setStatusMessage('Email confirmed successfully! You can now log in.');
+      } catch (error) {
+        console.error('Error confirming email:', error.response?.data || error.message);
+        setStatusMessage('Invalid or expired confirmation link.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    confirmEmail();
+  }, [key]);
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="w-full max-w-md p-8 space-y-4 bg-white rounded shadow">
+          <h1 className="text-2xl font-bold text-center">Confirming Email...</h1>
+          <p className="text-center">Please wait while we confirm your email.</p>
+        </div>
+      </div>
+    );
   }
 
   return (

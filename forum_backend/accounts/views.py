@@ -8,8 +8,34 @@ from rest_framework.response import Response
 from dj_rest_auth.views import LogoutView,LoginView,UserDetailsView
 from dj_rest_auth.registration.views import RegisterView
 from django.utils.timezone import now
+from dj_rest_auth.views import PasswordResetView as DjRestAuthPasswordResetView
+from .serializers import CustomPasswordResetSerializer
+from dj_rest_auth.serializers import PasswordResetConfirmSerializer
 
 # Create your views here.
+class PasswordResetConfirmView(generics.GenericAPIView):
+    """
+    Password reset e-mail link is confirmed, therefore
+    this resets the user's password.
+
+    Accepts the following POST parameters: new_password1, new_password2
+    """
+    serializer_class = PasswordResetConfirmSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, uidb64, token, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'detail': 'Password has been reset with the new password.'}, status=status.HTTP_200_OK)
+class CustomPasswordResetView(DjRestAuthPasswordResetView):
+    serializer_class = CustomPasswordResetSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Password reset email has been sent."}, status=status.HTTP_200_OK)
 class GoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
