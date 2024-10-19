@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "axios": "^1.7.7",
+    "busboy": "^1.6.0",
     "dompurify": "^3.1.7",
+    "formidable": "^3.5.2",
     "next": "14.2.15",
     "next-auth": "^4.24.8",
     "nookies": "^2.5.2",

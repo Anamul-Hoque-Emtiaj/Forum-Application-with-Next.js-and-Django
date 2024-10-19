@@ -86,6 +86,12 @@ const Header = () => {
                 Devices
               </Link>
               <Link
+                href="/tutorials"
+                className="text-gray-700 hover:text-blue-600"
+              >
+                Tutorials
+              </Link>
+              <Link
                 href="/accounts/profile"
                 className="text-gray-700 hover:text-blue-600"
               >
