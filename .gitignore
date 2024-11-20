@@ -16,6 +16,7 @@ venv/
 ENV/
 venv.bak/
 venv_env/
+migrations/
 
 # Django stuff:
 *.log
